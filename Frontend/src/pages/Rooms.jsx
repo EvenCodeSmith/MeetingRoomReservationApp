@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import { useSnackbar } from 'notistack'
 import { getRooms, createRoom, updateRoom, deleteRoom } from '../api/meetingRooms'
 import RoomCard from '../components/RoomCard'
@@ -10,18 +10,19 @@ export default function Rooms() {
     const [editingRoom, setEditingRoom] = useState(null)
     const { enqueueSnackbar } = useSnackbar()
 
-    useEffect(() => {
-        loadRooms()
-    }, [])
-
-    const loadRooms = async () => {
+    // ✅ Korrekt definieren mit useCallback, damit useEffect keine Warnung wirft
+    const loadRooms = useCallback(async () => {
         try {
             const data = await getRooms()
             setRooms(data)
-        } catch (error) {
+        } catch {
             enqueueSnackbar('Fehler beim Laden der Räume', { variant: 'error' })
         }
-    }
+    }, [enqueueSnackbar])
+
+    useEffect(() => {
+        loadRooms()
+    }, [loadRooms]) // ✅ Abhängigkeit korrekt angegeben
 
     const handleSave = async (room) => {
         try {
@@ -34,7 +35,7 @@ export default function Rooms() {
             }
             setEditingRoom(null)
             loadRooms()
-        } catch (error) {
+        } catch {
             enqueueSnackbar('Fehler beim Speichern des Raums', { variant: 'error' })
         }
     }
@@ -44,7 +45,7 @@ export default function Rooms() {
             await deleteRoom(id)
             enqueueSnackbar('Raum gelöscht', { variant: 'info' })
             loadRooms()
-        } catch (error) {
+        } catch {
             enqueueSnackbar('Fehler beim Löschen des Raums', { variant: 'error' })
         }
     }
@@ -54,7 +55,11 @@ export default function Rooms() {
             <Typography variant="h4" sx={{ mb: 2 }}>
                 Besprechungsräume
             </Typography>
-            <RoomForm onSave={handleSave} currentRoom={editingRoom} onCancel={() => setEditingRoom(null)} />
+            <RoomForm
+                onSave={handleSave}
+                currentRoom={editingRoom}
+                onCancel={() => setEditingRoom(null)}
+            />
             {rooms.map((room) => (
                 <RoomCard key={room._id} room={room} onEdit={setEditingRoom} onDelete={handleDelete} />
             ))}

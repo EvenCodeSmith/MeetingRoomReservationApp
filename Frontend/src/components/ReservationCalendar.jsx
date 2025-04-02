@@ -1,4 +1,4 @@
-import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
+﻿import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import deCH from 'date-fns/locale/de'
@@ -33,7 +33,7 @@ export default function ReservationCalendar({ reservations, rooms }) {
                 defaultView="week"
                 views={['week', 'day', 'agenda']}
                 messages={{
-                    week: 'Woche', day: 'Tag', agenda: 'Agenda', today: 'Heute', previous: 'Zur�ck', next: 'Weiter'
+                    week: 'Woche', day: 'Tag', agenda: 'Agenda', today: 'Heute', previous: 'Zurück', next: 'Weiter'
                 }}
             />
         </div>

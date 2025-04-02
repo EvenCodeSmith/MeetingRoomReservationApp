@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { TextField, Button, MenuItem, Box } from '@mui/material'
+import { useSnackbar } from 'notistack'
+import { isValidTimeRange, isOverlapping } from '../utils/validation'
 
-export default function ReservationForm({ rooms, onSave, currentReservation, onCancel }) {
+export default function ReservationForm({ rooms, reservations, onSave, currentReservation, onCancel }) {
     const [reservation, setReservation] = useState({
         roomId: '',
         reserver: '',
@@ -9,6 +11,8 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
         start: '',
         end: ''
     })
+
+    const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
         if (currentReservation) {
@@ -22,10 +26,26 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        if (new Date(reservation.start) >= new Date(reservation.end)) {
-            alert('Endzeit muss nach Startzeit liegen')
+
+        const newStart = new Date(reservation.start)
+        const newEnd = new Date(reservation.end)
+
+        if (!isValidTimeRange(reservation.start, reservation.end)) {
+            enqueueSnackbar('Startzeit muss vor der Endzeit liegen!', { variant: 'warning' })
             return
         }
+
+        // Check auf Überschneidung im gleichen Raum (außer eigene Reservierung beim Bearbeiten)
+        const relevantReservations = reservations.filter(r =>
+            r.roomId === reservation.roomId &&
+            (!currentReservation || r._id !== currentReservation._id)
+        )
+
+        if (isOverlapping(relevantReservations, newStart, newEnd)) {
+            enqueueSnackbar('Reservierung überschneidet sich mit einer bestehenden!', { variant: 'error' })
+            return
+        }
+
         onSave(reservation)
         setReservation({ roomId: '', reserver: '', purpose: '', start: '', end: '' })
     }
@@ -48,6 +68,7 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
                     </MenuItem>
                 ))}
             </TextField>
+
             <TextField
                 label="Reserviert von"
                 name="reserver"
@@ -57,6 +78,7 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
                 margin="normal"
                 required
             />
+
             <TextField
                 label="Zweck"
                 name="purpose"
@@ -65,6 +87,7 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
                 fullWidth
                 margin="normal"
             />
+
             <TextField
                 label="Startzeit"
                 name="start"
@@ -76,6 +99,7 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
                 required
                 InputLabelProps={{ shrink: true }}
             />
+
             <TextField
                 label="Endzeit"
                 name="end"
@@ -87,6 +111,7 @@ export default function ReservationForm({ rooms, onSave, currentReservation, onC
                 required
                 InputLabelProps={{ shrink: true }}
             />
+
             <Button type="submit" variant="contained">Speichern</Button>
             {onCancel && (
                 <Button onClick={onCancel} variant="text" sx={{ ml: 2 }}>

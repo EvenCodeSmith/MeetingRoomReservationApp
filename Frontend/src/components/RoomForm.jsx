@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { TextField, Button, Box } from '@mui/material'
 
 export default function RoomForm({ onSave, currentRoom, onCancel }) {
@@ -41,7 +41,7 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
                 required
             />
             <TextField
-                label="Kapazit�t"
+                label="Kapazität"
                 name="capacity"
                 value={room.capacity}
                 onChange={handleChange}
