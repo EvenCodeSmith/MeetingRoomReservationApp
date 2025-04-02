@@ -7,7 +7,7 @@ namespace MeetingRoomReservationAPI.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = null!;
+        public string? Id { get; set; }
         public string RoomId { get; set; } = null!;
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
