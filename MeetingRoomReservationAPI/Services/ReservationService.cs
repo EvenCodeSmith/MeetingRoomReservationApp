@@ -10,6 +10,10 @@ namespace MeetingRoomReservationAPI.Services
     {
         private readonly IMongoCollection<Reservation> _reservations;
 
+        public ReservationService(IMongoCollection<Reservation> reservations)
+        {
+            _reservations = reservations;
+        }
         public ReservationService(IOptions<MongoDBSettings> settings)
         {
             var client = new MongoClient(settings.Value.ConnectionString);
