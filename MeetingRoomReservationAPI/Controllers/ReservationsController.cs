@@ -39,6 +39,7 @@ namespace MeetingRoomReservationAPI.Controllers
                 reservation.RoomId, reservation.StartTime, reservation.EndTime
             );
 
+
             if (overlapping)
                 return Conflict("Der Raum ist zu diesem Zeitpunkt bereits reserviert.");
 
