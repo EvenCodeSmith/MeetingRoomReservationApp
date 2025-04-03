@@ -33,9 +33,9 @@ namespace MeetingRoomReservationAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(MeetingRoom room)
         {
-            if (room.Capacity < 1) //Wenn Kapazität kleiner ist als 1 fange an zu twerken!!!!!!
+            if (room.Capacity < 1 || room.Capacity > 40) //Wenn Kapazität kleiner ist als 1 oder grösser als 40 fange an zu twerken!!!!!!
             {
-                return BadRequest("Kapazität des Raumes muss mindestens 1 Persons betragen");
+                return BadRequest("Kapazität des Raumes muss zwischen 1 und 40 liegen");
             }
 
 
@@ -67,7 +67,7 @@ namespace MeetingRoomReservationAPI.Controllers
                 return NoContent();
             }
 
-            if (reservations.Any(r => r.RoomId == id))
+            if (reservations.Any(r => r.RoomId == id)) 
             {
                 return Conflict("Der Raum kann nicht gelöscht werden, da er noch Reservierungen hat.");
             }
