@@ -39,6 +39,7 @@ namespace MeetingRoomReservationAPI.Controllers
                 reservation.RoomId, reservation.StartTime, reservation.EndTime
             );
 
+
             if (overlapping)
                 return Conflict("Der Raum ist zu diesem Zeitpunkt bereits reserviert.");
 
@@ -53,6 +54,16 @@ namespace MeetingRoomReservationAPI.Controllers
             if (res == null) return NotFound();
 
             await _reservationService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(string id, Reservation reservation)
+        {
+            var existing = await _reservationService.GetAsync(id);
+            if (existing == null) return NotFound();
+            reservation.Id = id;
+            await _reservationService.UpdateAsync(id, reservation);
             return NoContent();
         }
     }

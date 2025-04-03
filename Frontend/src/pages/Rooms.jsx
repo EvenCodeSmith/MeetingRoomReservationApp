@@ -27,7 +27,7 @@ export default function Rooms() {
     const handleSave = async (room) => {
         try {
             if (editingRoom) {
-                await updateRoom(editingRoom._id, room)
+                await updateRoom(editingRoom.id || editingRoom._id, room)
                 enqueueSnackbar('Raum aktualisiert', { variant: 'success' })
             } else {
                 await createRoom(room)
@@ -61,7 +61,12 @@ export default function Rooms() {
                 onCancel={() => setEditingRoom(null)}
             />
             {rooms.map((room) => (
-                <RoomCard key={room._id} room={room} onEdit={setEditingRoom} onDelete={handleDelete} />
+                <RoomCard
+                    key={room.id || room._id}
+                    room={room}
+                    onEdit={setEditingRoom}
+                    onDelete={handleDelete}
+                />
             ))}
         </div>
     )

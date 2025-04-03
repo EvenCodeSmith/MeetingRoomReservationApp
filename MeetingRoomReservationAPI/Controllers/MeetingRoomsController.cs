@@ -31,6 +31,11 @@ namespace MeetingRoomReservationAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(MeetingRoom room)
         {
+            if (room.Capacity >= 1)
+            {
+                return BadRequest("Kapazität des Raumes muss mindestens 1 Persons betragen");
+            }
+
             await _meetingRoomService.CreateAsync(room);
             return CreatedAtAction(nameof(Get), new { id = room.Id }, room);
         }

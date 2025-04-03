@@ -2,14 +2,18 @@
 import { TextField, Button, Box } from '@mui/material'
 
 export default function RoomForm({ onSave, currentRoom, onCancel }) {
-    const [room, setRoom] = useState({ name: '', capacity: '', features: '' })
+    const [room, setRoom] = useState({
+        name: '',
+        capacity: '',
+        equipment: ''
+    })
 
     useEffect(() => {
         if (currentRoom) {
             setRoom({
                 name: currentRoom.name,
                 capacity: currentRoom.capacity,
-                features: currentRoom.features?.join(', ')
+                equipment: currentRoom.equipment?.join(', ') || ''
             })
         }
     }, [currentRoom])
@@ -20,13 +24,19 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
 
     const handleSubmit = (e) => {
         e.preventDefault()
+
         const formattedRoom = {
             ...room,
-            capacity: parseInt(room.capacity),
-            features: room.features.split(',').map((f) => f.trim())
+            capacity: Math.max(1, parseInt(room.capacity) || 1), // 🧠 Nie kleiner als 1
+            equipment: room.equipment
+                .split(',')
+                .map((f) => f.trim())
+                .filter((f) => f.length > 0)
         }
+
         onSave(formattedRoom)
-        setRoom({ name: '', capacity: '', features: '' })
+
+        setRoom({ name: '', capacity: '', equipment: '' })
     }
 
     return (
@@ -49,11 +59,12 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
                 margin="normal"
                 required
                 type="number"
+                inputProps={{ min: 1 }}
             />
             <TextField
                 label="Ausstattung (kommagetrennt)"
-                name="features"
-                value={room.features}
+                name="equipment"
+                value={room.equipment}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"

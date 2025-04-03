@@ -1,23 +1,23 @@
 import axios from 'axios'
+import API_BASE_URL from './apiConfig'
 
-const API_BASE = 'http://localhost:5000/api/MeetingRooms' // ggf. anpassen
+const endpoint = `${API_BASE_URL}/meetingrooms`
 
 export const getRooms = async () => {
-    const res = await axios.get(API_BASE)
+    const res = await axios.get(endpoint)
     return res.data
 }
 
 export const createRoom = async (room) => {
-    const res = await axios.post(API_BASE, room)
+    const res = await axios.post(endpoint, room)
     return res.data
 }
 
 export const updateRoom = async (id, room) => {
-    const res = await axios.put(`${API_BASE}/${id}`, room)
+    const res = await axios.put(`${endpoint}/${id}`, room)
     return res.data
 }
 
 export const deleteRoom = async (id) => {
-    const res = await axios.delete(`${API_BASE}/${id}`)
-    return res.data
+    await axios.delete(`${endpoint}/${id}`)
 }

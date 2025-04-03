@@ -29,6 +29,9 @@ namespace MeetingRoomReservationAPI.Services
         public async Task DeleteAsync(string id) =>
             await _reservations.DeleteOneAsync(r => r.Id == id);
 
+        public async Task UpdateAsync(string id, Reservation reservation) =>
+            await _reservations.ReplaceOneAsync(r => r.Id == id, reservation);
+
         public async Task<bool> IsOverlappingReservationAsync(string roomId, DateTime start, DateTime end)
         {
             var overlapping = await _reservations.Find(r =>

@@ -1,23 +1,23 @@
 import axios from 'axios'
+import API_BASE_URL from './apiConfig'
 
-const API_BASE = 'http://localhost:5000/api/Reservations' // ggf. anpassen
+const endpoint = `${API_BASE_URL}/reservations`
 
 export const getReservations = async () => {
-    const res = await axios.get(API_BASE)
+    const res = await axios.get(endpoint)
     return res.data
 }
 
 export const createReservation = async (reservation) => {
-    const res = await axios.post(API_BASE, reservation)
+    const res = await axios.post(endpoint, reservation)
     return res.data
 }
 
 export const updateReservation = async (id, reservation) => {
-    const res = await axios.put(`${API_BASE}/${id}`, reservation)
+    const res = await axios.put(`${endpoint}/${id}`, reservation)
     return res.data
 }
 
 export const deleteReservation = async (id) => {
-    const res = await axios.delete(`${API_BASE}/${id}`)
-    return res.data
+    await axios.delete(`${endpoint}/${id}`)
 }

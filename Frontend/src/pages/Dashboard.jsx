@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useState, useCallback } from 'react'
 import { useSnackbar } from 'notistack'
 import { getRooms } from '../api/meetingRooms'
 import { getReservations } from '../api/reservations'
@@ -10,11 +10,8 @@ export default function Dashboard() {
     const [todayCount, setTodayCount] = useState(0)
     const { enqueueSnackbar } = useSnackbar()
 
-    useEffect(() => {
-        loadData()
-    }, [])
-
-    const loadData = async () => {
+    // ✅ useCallback verhindert eslint warning bei useEffect
+    const loadData = useCallback(async () => {
         try {
             const rooms = await getRooms()
             const reservations = await getReservations()
@@ -24,29 +21,45 @@ export default function Dashboard() {
 
             const today = new Date()
             const countToday = reservations.filter(r => {
-                const start = new Date(r.start)
-                const end = new Date(r.end)
+                const start = new Date(r.startTime || r.start)
+                const end = new Date(r.endTime || r.end)
                 return start <= today && end >= today
             }).length
 
             setTodayCount(countToday)
-        } catch (error) {
+        } catch {
             enqueueSnackbar('Fehler beim Laden des Dashboards', { variant: 'error' })
         }
-    }
+    }, [enqueueSnackbar])
+
+    useEffect(() => {
+        loadData()
+    }, [loadData]) // 🔁 korrekt angegeben
 
     return (
         <div>
             <Typography variant="h4" sx={{ mb: 2 }}>Dashboard</Typography>
             <Grid container spacing={2}>
                 <Grid item xs={12} md={4}>
-                    <Card><CardContent><Typography>Anzahl Räume: {roomCount}</Typography></CardContent></Card>
+                    <Card>
+                        <CardContent>
+                            <Typography>Anzahl Räume: {roomCount}</Typography>
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <Card><CardContent><Typography>Reservierungen gesamt: {reservationCount}</Typography></CardContent></Card>
+                    <Card>
+                        <CardContent>
+                            <Typography>Reservierungen gesamt: {reservationCount}</Typography>
+                        </CardContent>
+                    </Card>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <Card><CardContent><Typography>Reservierungen heute aktiv: {todayCount}</Typography></CardContent></Card>
+                    <Card>
+                        <CardContent>
+                            <Typography>Reservierungen heute aktiv: {todayCount}</Typography>
+                        </CardContent>
+                    </Card>
                 </Grid>
             </Grid>
         </div>
