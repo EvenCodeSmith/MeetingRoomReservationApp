@@ -3,7 +3,6 @@ import { TextField, Button, MenuItem, Box } from '@mui/material'
 import { useSnackbar } from 'notistack'
 import { isValidTimeRange, isOverlapping } from '../utils/validation'
 
-// 🔧 Formatzeit für <input type="datetime-local" />
 const formatDatetimeLocal = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
@@ -23,6 +22,14 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
     const { enqueueSnackbar } = useSnackbar()
 
     useEffect(() => {
+        const empty = {
+            roomId: '',
+            reservedBy: '',
+            purpose: '',
+            startTime: '',
+            endTime: ''
+        }
+
         if (currentReservation) {
             setReservation({
                 roomId: currentReservation.roomId,
@@ -31,11 +38,14 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 startTime: currentReservation.startTime,
                 endTime: currentReservation.endTime
             })
+        } else {
+            setReservation(empty)
         }
     }, [currentReservation])
 
     const handleChange = (e) => {
-        setReservation({ ...reservation, [e.target.name]: e.target.value })
+        const { name, value } = e.target
+        setReservation({ ...reservation, [name]: value })
     }
 
     const handleSubmit = (e) => {
@@ -72,6 +82,17 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
         }
     }
 
+    const handleCancel = () => {
+        setReservation({
+            roomId: '',
+            reservedBy: '',
+            purpose: '',
+            startTime: '',
+            endTime: ''
+        })
+        if (onCancel) onCancel()
+    }
+
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ mb: 3 }}>
             <TextField
@@ -85,7 +106,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 required
             >
                 {rooms.map((room) => (
-                    <MenuItem key={room.id || room._id} value={room.id || room._id}>
+                    <MenuItem key={room.id} value={room.id}>
                         {room.name}
                     </MenuItem>
                 ))}
@@ -120,6 +141,14 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 margin="normal"
                 required
                 InputLabelProps={{ shrink: true }}
+                inputRef={(ref) => {
+                    if (ref) {
+                        ref.addEventListener('click', () => ref.showPicker?.())
+                    }
+                }}
+                inputProps={{
+                    onKeyDown: (e) => e.preventDefault() // ⛔ Blockiere manuelle Eingabe
+                }}
             />
 
             <TextField
@@ -132,14 +161,20 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 margin="normal"
                 required
                 InputLabelProps={{ shrink: true }}
+                inputRef={(ref) => {
+                    if (ref) {
+                        ref.addEventListener('click', () => ref.showPicker?.())
+                    }
+                }}
+                inputProps={{
+                    onKeyDown: (e) => e.preventDefault()
+                }}
             />
 
             <Button type="submit" variant="contained">Speichern</Button>
-            {onCancel && (
-                <Button onClick={onCancel} variant="text" sx={{ ml: 2 }}>
-                    Abbrechen
-                </Button>
-            )}
+            <Button onClick={handleCancel} variant="text" sx={{ ml: 2 }}>
+                Abbrechen
+            </Button>
         </Box>
     )
 }

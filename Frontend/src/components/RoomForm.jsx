@@ -2,41 +2,46 @@
 import { TextField, Button, Box } from '@mui/material'
 
 export default function RoomForm({ onSave, currentRoom, onCancel }) {
-    const [room, setRoom] = useState({
-        name: '',
-        capacity: '',
-        equipment: ''
-    })
+    const initialRoom = { name: '', capacity: '', equipment: '' }
+    const [room, setRoom] = useState(initialRoom)
 
     useEffect(() => {
         if (currentRoom) {
             setRoom({
-                name: currentRoom.name,
-                capacity: currentRoom.capacity,
-                equipment: currentRoom.equipment?.join(', ') || ''
+                name: currentRoom.name || '',
+                capacity: currentRoom.capacity || '',
+                equipment: Array.isArray(currentRoom.equipment)
+                    ? currentRoom.equipment.join(', ')
+                    : ''
             })
+        } else {
+            setRoom({ name: '', capacity: '', equipment: '' }) // direkt hier
         }
     }, [currentRoom])
 
     const handleChange = (e) => {
-        setRoom({ ...room, [e.target.name]: e.target.value })
+        setRoom(prev => ({ ...prev, [e.target.name]: e.target.value }))
     }
 
     const handleSubmit = (e) => {
         e.preventDefault()
 
         const formattedRoom = {
-            ...room,
-            capacity: Math.max(1, parseInt(room.capacity) || 1), // 🧠 Nie kleiner als 1
+            name: room.name.trim(),
+            capacity: Math.max(1, parseInt(room.capacity)),
             equipment: room.equipment
                 .split(',')
-                .map((f) => f.trim())
-                .filter((f) => f.length > 0)
+                .map(f => f.trim())
+                .filter(Boolean)
         }
 
         onSave(formattedRoom)
+        setRoom(initialRoom)
+    }
 
-        setRoom({ name: '', capacity: '', equipment: '' })
+    const handleCancel = () => {
+        setRoom(initialRoom)
+        if (onCancel) onCancel()
     }
 
     return (
@@ -69,14 +74,10 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
                 fullWidth
                 margin="normal"
             />
-            <Button type="submit" variant="contained">
-                Speichern
+            <Button type="submit" variant="contained">Speichern</Button>
+            <Button onClick={handleCancel} variant="text" sx={{ ml: 2 }}>
+                Abbrechen
             </Button>
-            {onCancel && (
-                <Button onClick={onCancel} variant="text" sx={{ ml: 2 }}>
-                    Abbrechen
-                </Button>
-            )}
         </Box>
     )
 }

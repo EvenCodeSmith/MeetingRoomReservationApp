@@ -40,3 +40,17 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Klare vertikale Linie zwischen Ressourcen-Spalten */
+.rbc-time-header-content > .rbc-row.rbc-row-resource {
+    border-bottom: 2px solid #aaa;
+}
+
+.rbc-time-header-content .rbc-header {
+    border-right: 2px solid #ccc;
+}
+
+    /* Letzte Spalte ohne Rand */
+    .rbc-time-header-content .rbc-header:last-child {
+        border-right: none;
+}
