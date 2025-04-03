@@ -10,6 +10,7 @@ namespace MeetingRoomReservationAPI.Controllers
     public class MeetingRoomsController : ControllerBase
     {
         private readonly MeetingRoomService _meetingRoomService;
+        private readonly ReservationService _reservationService;
 
         public MeetingRoomsController(MeetingRoomService service)
         {
@@ -55,9 +56,18 @@ namespace MeetingRoomReservationAPI.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             var room = await _meetingRoomService.GetAsync(id);
-            if (room == null) return NotFound();
+            if (room == null)
+                return NotFound();
+
+            var reservations = await _reservationService.GetAsync();
+            if (reservations.Any(r => r.RoomId == id)) 
+            {
+                return Conflict("Der Raum kann nicht gelöscht werden, da er noch Reservierungen hat.");
+            }
+
             await _meetingRoomService.DeleteAsync(id);
             return NoContent();
         }
+
     }
 }
