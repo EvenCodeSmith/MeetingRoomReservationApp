@@ -15,7 +15,7 @@ export default function MainLayout({ children }) {
             <AppBar position="static">
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        📅 MeetingRoom App
+                        📅 MeetingPoint
                     </Typography>
                     {navItems.map((item) => (
                         <Button
