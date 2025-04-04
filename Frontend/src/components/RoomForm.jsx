@@ -10,7 +10,7 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
     // 🧠 useState Hook für das Formular
     const [room, setRoom] = useState(initialRoom)
 
-    // 🔁 Wenn currentRoom gesetzt wird (z. B. zum Bearbeiten), lade dessen Daten ins Formular
+    // 🔁 Wenn currentRoom gesetzt wird (zb zum Bearbeiten), lade dessen Daten ins Formular
     useEffect(() => {
         if (currentRoom) {
             setRoom({
@@ -45,7 +45,7 @@ export default function RoomForm({ onSave, currentRoom, onCancel }) {
                 .filter(Boolean)        // Leere Einträge entfernen
         }
 
-        onSave(formattedRoom) // ⬆️ Übergabe an Elternkomponente (z. B. zum Speichern)
+        onSave(formattedRoom) // ⬆️ Übergabe an Elternkomponente (zb zum Speichern)
         setRoom(initialRoom)  // 🔄 Formular zurücksetzen
     }
 
