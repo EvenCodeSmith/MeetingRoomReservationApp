@@ -2,125 +2,195 @@
 
 ## 🗃️ Projektübersicht
 
-MeetingPoint ist eine Webanwendung zur Verwaltung und Reservierung von Besprechungsräumen. Das System bietet eine übersichtliche Benutzeroberfläche und einfache Verwaltungsmöglichkeiten sowohl für Endbenutzer als auch für Administratoren.
+**MeetingPoint** ist eine moderne Webanwendung zur Verwaltung und Reservierung von Besprechungsräumen. Sie bietet eine intuitive Kalenderansicht, einfache Verwaltung von Räumen und Reservierungen sowie eine Echtzeit-Dashboard-Übersicht.
 
-Die Architektur besteht aus einem Frontend, das mit **React** entwickelt wurde, und einem Backend, das auf **ASP.NET Core WebAPI** basiert. Als Datenbank wird **MongoDB** verwendet.
+Die Anwendung besteht aus:
+- einem **Frontend mit React (Vite, Material UI, Big Calendar)**,
+- einem **Backend mit ASP.NET Core WebAPI**,
+- einer **MongoDB-Datenbank** für die persistente Speicherung.
 
 ---
 
-## 📂 Projektstruktur
+## 📁 Projektstruktur
 
+### 🔹 Frontend (React)
+
+```plaintext
+Frontend/
+├── public/                         # Statische Dateien wie Logos
+│   ├── MeetingPoint-Logo.png
+│   └── ...
+├── src/
+│   ├── api/                        # API-Requests zu Backend
+│   │   ├── apiConfig.js
+│   │   ├── meetingRooms.js
+│   │   └── reservations.js
+│   ├── components/                 # Wiederverwendbare UI-Komponenten
+│   │   ├── ReservationCalendar.jsx
+│   │   ├── ReservationForm.jsx
+│   │   ├── RoomCard.jsx
+│   │   └── RoomForm.jsx
+│   ├── layouts/                   # Layout-Komponenten wie Navigation
+│   │   └── MainLayout.jsx
+│   ├── pages/                     # Seiten: Dashboard, Räume, Reservierungen
+│   │   ├── Dashboard.jsx
+│   │   ├── Reservations.jsx
+│   │   └── Rooms.jsx
+│   ├── styles/
+│   │   └── global.css             # Globale Styles & Kalenderanpassungen
+│   ├── utils/
+│   │   └── validation.js          # Validierungslogik für Reservierungen
+│   ├── App.jsx
+│   ├── App.css
+│   ├── main.jsx
+│   └── theme.js                   # MUI-Theme-Konfiguration
+├── eslint.config.js               # ESLint Setup für Codequalität
+├── index.html
+├── vite.config.js
+└── package.json
 ```
-MeetingRoomReservationApp/
-├── Frontend/
-│   ├── public/
-│   │   ├── index.html
-│   │   └── favicon.ico
-│   └── src/
-│       ├── api/
-│       │   ├── meetingRooms.js
-│       │   └── reservations.js
-│       ├── components/
-│       │   ├── ReservationCalendar.jsx
-│       │   └── ReservationForm.jsx
-│       ├── pages/
-│       │   ├── Dashboard.jsx
-│       │   └── Reservations.jsx
-│       ├── App.css
-│       ├── App.jsx
-│       └── main.jsx
-│
-└── Backend (MeetingRoomReservationAPI)/
-    ├── Controllers/
-    │   ├── MeetingRoomsController.cs
-    │   └── ReservationsController.cs
-    ├── Models/
-    │   ├── MeetingRoom.cs
-    │   └── Reservation.cs
-    ├── Services/
-    │   ├── MeetingRoomService.cs
-    │   └── ReservationService.cs
-    ├── Program.cs
-    └── Startup.cs
+
+### 🔸 Backend (ASP.NET Core WebAPI)
+
+```plaintext
+MeetingRoomReservationAPI/
+├── Controllers/
+│   ├── MeetingRoomsController.cs
+│   └── ReservationsController.cs
+├── Models/
+│   ├── MeetingRoom.cs
+│   └── Reservation.cs
+├── Services/
+│   ├── MeetingRoomService.cs
+│   └── ReservationService.cs
+├── Settings/
+│   └── MongoDBSettings.cs
+├── Program.cs
+├── appsettings.json
+├── appsettings.Development.json
+├── launchSettings.json
+├── MeetingRoomReservationAPI.csproj
+└── MeetingRoomReservationAPI.http
+```
+
+### 🧪 Tests (xUnit)
+
+```plaintext
+MeetingRoomReservationTests/
+├── ReservationServiceTest.cs
+└── MeetingRoomReservationTests.csproj
 ```
 
 ---
 
-## 🌐 Frontend
+## 🌐 Frontend – Features
 
-### Technologien
-- **React** mit **Vite**
-- **Material UI (MUI)**
-- **React Big Calendar** (für Kalendereinträge)
-- **Notistack** (Snackbar-Benachrichtigungen)
+- 📅 **Kalenderansicht mit Ressourcen-Spalten**:
+  - Darstellung nach Raum (resourceId)
+  - Wochen-, Tages- und Agendaansicht
+  - Längere Termine werden korrekt auf mehrere Tage verteilt
 
-### Aufbau
-- **`public/index.html`**: Enthält die Basisseite, Titel und Icons.
-- **`src/api`**: Enthält alle API-Aufrufe zu MeetingRooms und Reservations.
-- **`src/components`**: Enthält wiederverwendbare UI-Komponenten:
-  - `ReservationCalendar.jsx`: Zeigt Reservierungen übersichtlich im Kalender an.
-  - `ReservationForm.jsx`: Erlaubt das Erstellen/Bearbeiten von Reservierungen mit Kalenderauswahl (ohne manuelle Eingabe).
-- **`src/pages`**: Seitenkomponenten zur Navigation:
-  - `Dashboard.jsx`: Zeigt Statistik und Raumstatus mit klarer Übersicht über aktuelle und zukünftige Belegungen.
-  - `Reservations.jsx`: Ermöglicht die Verwaltung von Reservierungen (Liste und Kalender).
+- 🏷️ **Raumfilterung & Auswahl**:
+  - Alle Räume oder einzelne Räume anzeigen
+  - Tabs zur schnellen Navigation
 
-### Features
-- Dynamische Kalenderansicht mit Filtern nach Räumen.
-- Live-Benachrichtigungen bei Fehlern und Erfolgsmeldungen.
-- Validierung der Eingabedaten zur Vermeidung von Überschneidungen.
+- ⚠️ **Eingabeschutz bei Datum/Zeit**:
+  - Kein manuelles Eintippen des Datums möglich
+  - Nur Auswahl über Date-Picker erlaubt
+
+- 🔔 **Snackbar-Benachrichtigungen**:
+  - Erfolgreiche Aktionen, Warnungen und Fehler
+
+- ✏️ **Bearbeiten & Löschen direkt aus der Liste**
 
 ---
 
-## ⚙️ Backend
+## ⚙️ Backend – Features
 
-### Technologien
-- **ASP.NET Core WebAPI**
-- **MongoDB** als NoSQL-Datenbank
-- **Swagger** zur API-Dokumentation
-
-### Aufbau
-- **`Controllers`**: Bearbeiten eingehende HTTP-Anfragen und kommunizieren mit den Services.
-  - `MeetingRoomsController`: CRUD-Operationen für Räume.
-  - `ReservationsController`: CRUD-Operationen für Reservierungen, inkl. Validierung.
-- **`Models`**: Beschreiben die Struktur der Daten:
-  - `MeetingRoom.cs`: Definition eines Raumes.
-  - `Reservation.cs`: Definition einer Reservierung.
-- **`Services`**: Enthalten die Geschäftslogik:
-  - Überprüfung auf Überschneidungen bei Reservierungen.
-  - Speicherung und Abfrage von Daten in MongoDB.
-- **`Startup.cs`**: Registrierung von Middleware und Services.
-
-### Features
-- REST-API mit eindeutiger HTTP-Statuscodierung.
-- Validierung von Reservierungen auf Zeitkonflikte (409-Conflict).
-- Persistente Speicherung in MongoDB.
+- ✅ REST-API mit sauberem Routing (`/api/meetingrooms`, `/api/reservations`)
+- 🔁 Validierung gegen Überschneidungen bei Reservierungen
+- 🕒 Zeitlogik mit Start-/Endzeitprüfung
+- 📃 Swagger kann für API-Testzwecke eingebunden werden
+- 💾 MongoDB-Anbindung mit Konfigurationsdatei
 
 ---
 
-## 💾 Datenbank (MongoDB)
+## 📊 Dashboard-Funktionen
 
-Daten werden in zwei primären Collections gespeichert:
-- `MeetingRooms`: Enthält Daten zu den verfügbaren Räumen.
-- `Reservations`: Enthält alle Reservierungsdaten mit Zeiträumen und Nutzerinformationen.
-
----
-
-## 🎨 UI/UX und Anpassungen
-
-- Das Frontend bietet eine klare, benutzerfreundliche Oberfläche auf Basis von Material UI.
-- Kalenderansicht wurde optimiert, um Benutzerfehler bei der Datumseingabe zu minimieren.
-- Schnelle Statusübersicht der Räume im Dashboard, inklusive Countdown bis zur nächsten Reservierung.
+- Gesamtanzahl der Räume und Reservierungen
+- Anzeige: **aktive Reservierungen** am aktuellen Tag
+- Status je Raum:
+  - 🔴 Belegt – noch *Xh Ymin*
+  - 🟡 Reserviert in *Xh*
+  - 🟢 Frei – keine Reservierung offen
 
 ---
 
-## 🔧 Änderungen und Personalisierung
+## 🚀 Startanleitung
 
-- **Projektname:** Umbenennung von "MeetingRoom App" zu **"MeetingPoint"**.
-- **Browser-Tab:** Umbenannt zu **"AG-Service"** und mit neuem Favicon versehen.
+### 📦 Frontend starten
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+### 🖥 Backend starten
+
+```bash
+cd MeetingRoomReservationAPI
+dotnet run
+```
+
+### 🔍 Backend Tests ausführen
+
+```bash
+cd MeetingRoomReservationTests
+dotnet test
+```
 
 ---
 
-## 🚀 Fazit
+## 🧪 Validierung & Fehlerbehandlung
 
-MeetingPoint bietet eine modulare, klar strukturierte und einfach erweiterbare Lösung für Besprechungsraumverwaltung. Frontend und Backend sind sauber voneinander getrennt und interagieren ausschließlich über eine REST-API. Diese Architektur ermöglicht eine einfache Wartung und Erweiterbarkeit des Systems.
+- Automatische Zeitprüfung (Start vor Ende)
+- Keine Überschneidungen erlaubt
+- Gültige Jahreswerte nur über Picker (kein manuelles Eingeben möglich)
+- Einheitliches Snackbar-System für User-Feedback
 
+---
+
+## 🧭 Navigation & Layout
+
+- **Hauptnavigation oben** (MUI AppBar)
+- Aktive Seite wird visuell hervorgehoben
+- Navigation zwischen:
+  - Dashboard
+  - Räume
+  - Reservierungen
+
+---
+
+## ✨ Personalisierungen
+
+- ✅ Projektname geändert zu **MeetingPoint**
+- ✅ Tab-Titel angepasst zu **AG-Service**
+- ✅ Neues Logo & Favicon eingebunden
+- ✅ Kalender visuell verbessert (Raumabgrenzungen)
+- ✅ Eingabeschutz für Datum & Zeit aktiviert
+- ✅ Snackbar-Meldungen überall integriert
+- ✅ Statusübersicht für jeden Raum im Dashboard
+
+---
+
+## 👨‍💻 Entwickler
+
+**Even Stuck, Yannick Frei, Tunahan Keser**   
+> Projektwoche IBZ | 2025
+
+---
+
+## 📃 Lizenz
+
+MIT License – Nutzung & Anpassung erlaubt.
