@@ -1,27 +1,33 @@
-﻿import { useEffect, useState, useCallback } from 'react'
-import { useSnackbar } from 'notistack'
-import { getRooms } from '../api/meetingRooms'
+﻿// 📦 React und benötigte Hooks importieren
+import { useEffect, useState, useCallback } from 'react'
+import { useSnackbar } from 'notistack' // Snackbar für Feedback (Erfolg, Fehler)
+import { getRooms } from '../api/meetingRooms' // API-Funktion zum Laden der Räume
 import {
-    getReservations,
-    createReservation,
-    updateReservation,
-    deleteReservation
+    getReservations,     // 🗂️ Reservierungen abrufen
+    createReservation,   // ➕ Neue Reservierung erstellen
+    updateReservation,   // ✏️ Reservierung aktualisieren
+    deleteReservation    // 🗑️ Reservierung löschen
 } from '../api/reservations'
-import ReservationForm from '../components/ReservationForm'
-import ReservationCalendar from '../components/ReservationCalendar'
+
+import ReservationForm from '../components/ReservationForm'         // 📝 Formular zum Erstellen/Bearbeiten
+import ReservationCalendar from '../components/ReservationCalendar' // 📅 Kalender zur Anzeige
+
 import {
     Typography,
     Card,
     CardContent,
     Button
-} from '@mui/material'
+} from '@mui/material' // Material UI-Komponenten
 
+// 💡 Hauptkomponente für das Reservierungs-Management
 export default function Reservations() {
+    // 📊 State für Räume, Reservierungen und die aktuell bearbeitete Reservierung
     const [rooms, setRooms] = useState([])
     const [reservations, setReservations] = useState([])
     const [editingReservation, setEditingReservation] = useState(null)
     const { enqueueSnackbar } = useSnackbar()
 
+    // 🔄 Räume laden (nur einmal pro Komponente durch useCallback + useEffect)
     const loadRooms = useCallback(async () => {
         try {
             const data = await getRooms()
@@ -31,6 +37,7 @@ export default function Reservations() {
         }
     }, [enqueueSnackbar])
 
+    // 🔄 Reservierungen laden
     const loadReservations = useCallback(async () => {
         try {
             const data = await getReservations()
@@ -40,11 +47,13 @@ export default function Reservations() {
         }
     }, [enqueueSnackbar])
 
+    // ⏱️ Daten laden beim Initialisieren der Komponente
     useEffect(() => {
         loadRooms()
         loadReservations()
     }, [loadRooms, loadReservations])
 
+    // 💾 Neue oder bearbeitete Reservierung speichern
     const handleSave = async (res) => {
         try {
             if (editingReservation) {
@@ -54,13 +63,14 @@ export default function Reservations() {
                 await createReservation(res)
                 enqueueSnackbar('Reservierung erstellt', { variant: 'success' })
             }
-            setEditingReservation(null)
+            setEditingReservation(null) // Zurücksetzen nach dem Speichern
             loadReservations()
         } catch {
             enqueueSnackbar('Fehler beim Speichern der Reservierung', { variant: 'error' })
         }
     }
 
+    // 🗑️ Reservierung löschen
     const handleDelete = async (id) => {
         if (!id) {
             enqueueSnackbar('Fehler: Reservierungs-ID fehlt', { variant: 'error' })
@@ -76,15 +86,19 @@ export default function Reservations() {
         }
     }
 
+    // 🔎 Hilfsfunktion: Raumnamen anhand der ID herausfinden
     const getRoomName = (roomId) => {
         const room = rooms.find((r) => r.id === roomId)
         return room?.name || 'Unbekannt'
     }
 
+    // 🧱 Aufbau der Komponente
     return (
         <div>
+            {/* 🔠 Titel */}
             <Typography variant="h4" sx={{ mb: 2 }}>Reservierungen</Typography>
 
+            {/* ✍️ Formular zum Erstellen oder Bearbeiten */}
             <ReservationForm
                 rooms={rooms}
                 reservations={reservations}
@@ -93,6 +107,7 @@ export default function Reservations() {
                 onCancel={() => setEditingReservation(null)}
             />
 
+            {/* 🧾 Liste aller bestehenden Reservierungen */}
             {reservations.map((r) => (
                 <Card key={r.id} sx={{ mb: 2 }}>
                     <CardContent>
@@ -107,6 +122,7 @@ export default function Reservations() {
                 </Card>
             ))}
 
+            {/* 📅 Kalenderansicht aller Reservierungen */}
             <ReservationCalendar reservations={reservations} rooms={rooms} />
         </div>
     )

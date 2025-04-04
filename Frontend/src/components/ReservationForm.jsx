@@ -1,8 +1,10 @@
-﻿import { useState, useEffect } from 'react'
+﻿// 📦 React Hooks und MUI-Komponenten importieren
+import { useState, useEffect } from 'react'
 import { TextField, Button, MenuItem, Box } from '@mui/material'
-import { useSnackbar } from 'notistack'
-import { isValidTimeRange, isOverlapping } from '../utils/validation'
+import { useSnackbar } from 'notistack' // Snackbar für Benachrichtigungen
+import { isValidTimeRange, isOverlapping } from '../utils/validation' // Validierungsfunktionen
 
+// 🧮 Hilfsfunktion zum Formatieren von datetime-local Strings
 const formatDatetimeLocal = (dateString) => {
     if (!dateString) return ''
     const date = new Date(dateString)
@@ -10,7 +12,9 @@ const formatDatetimeLocal = (dateString) => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
+// 🧾 Hauptkomponente: Formular zur Erstellung/Bearbeitung einer Reservierung
 export default function ReservationForm({ rooms, reservations, onSave, currentReservation, onCancel }) {
+    // 📦 Lokaler State für das Reservierungsobjekt
     const [reservation, setReservation] = useState({
         roomId: '',
         reservedBy: '',
@@ -19,8 +23,9 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
         endTime: ''
     })
 
-    const { enqueueSnackbar } = useSnackbar()
+    const { enqueueSnackbar } = useSnackbar() // Snackbar zum Anzeigen von Feedback
 
+    // 🔁 Wenn `currentReservation` gesetzt ist, Daten in Formular übernehmen
     useEffect(() => {
         const empty = {
             roomId: '',
@@ -43,22 +48,26 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
         }
     }, [currentReservation])
 
+    // 🖊️ Eingaben aktualisieren
     const handleChange = (e) => {
         const { name, value } = e.target
         setReservation({ ...reservation, [name]: value })
     }
 
+    // ✅ Validierung & Übergabe beim Speichern
     const handleSubmit = (e) => {
         e.preventDefault()
 
         const newStart = new Date(reservation.startTime)
         const newEnd = new Date(reservation.endTime)
 
+        // 🔐 Validierung: Start vor Endzeit?
         if (!isValidTimeRange(newStart, newEnd)) {
             enqueueSnackbar('Startzeit muss vor der Endzeit liegen!', { variant: 'warning' })
             return
         }
 
+        // 🔁 Prüfen auf Überschneidung mit bestehenden Reservierungen (gleicher Raum)
         const relevantReservations = reservations.filter(r =>
             r.roomId === reservation.roomId &&
             (!currentReservation || r.id !== currentReservation.id)
@@ -69,8 +78,10 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
             return
         }
 
+        // 📤 Reservierung speichern
         onSave(reservation)
 
+        // 🧹 Formular leeren (nur wenn es sich um eine neue Reservierung handelt)
         if (!currentReservation) {
             setReservation({
                 roomId: '',
@@ -82,6 +93,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
         }
     }
 
+    // ⛔ Abbrechen: Formular zurücksetzen
     const handleCancel = () => {
         setReservation({
             roomId: '',
@@ -95,6 +107,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
 
     return (
         <Box component="form" onSubmit={handleSubmit} sx={{ mb: 3 }}>
+            {/* 🔽 Raumauswahl (Dropdown) */}
             <TextField
                 select
                 label="Raum"
@@ -112,6 +125,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 ))}
             </TextField>
 
+            {/* 🧑 Eingabefeld: Wer reserviert */}
             <TextField
                 label="Reserviert von"
                 name="reservedBy"
@@ -122,6 +136,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 required
             />
 
+            {/* 📝 Zweck der Reservierung */}
             <TextField
                 label="Zweck"
                 name="purpose"
@@ -131,6 +146,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 margin="normal"
             />
 
+            {/* 📅 Startzeit mit Datums-/Uhrzeitauswahl */}
             <TextField
                 label="Startzeit"
                 name="startTime"
@@ -143,14 +159,15 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 InputLabelProps={{ shrink: true }}
                 inputRef={(ref) => {
                     if (ref) {
-                        ref.addEventListener('click', () => ref.showPicker?.())
+                        ref.addEventListener('click', () => ref.showPicker?.()) // 📆 Öffne Picker beim Klick
                     }
                 }}
                 inputProps={{
-                    onKeyDown: (e) => e.preventDefault() // ⛔ Blockiere manuelle Eingabe
+                    onKeyDown: (e) => e.preventDefault() // ⛔ Verhindere manuelle Eingabe
                 }}
             />
 
+            {/* 🕒 Endzeit mit Picker */}
             <TextField
                 label="Endzeit"
                 name="endTime"
@@ -171,6 +188,7 @@ export default function ReservationForm({ rooms, reservations, onSave, currentRe
                 }}
             />
 
+            {/* 💾 Buttons */}
             <Button type="submit" variant="contained">Speichern</Button>
             <Button onClick={handleCancel} variant="text" sx={{ ml: 2 }}>
                 Abbrechen

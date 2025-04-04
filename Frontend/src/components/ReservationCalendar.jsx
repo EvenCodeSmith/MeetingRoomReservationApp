@@ -1,15 +1,24 @@
-﻿import { useState } from 'react'
+﻿// 📦 React Hooks für State-Management
+import { useState } from 'react'
+
+// 📅 React Big Calendar & Styles
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+
+// 🗓️ Tools zur Zeitverarbeitung
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import deCH from 'date-fns/locale/de'
+
+// 🔔 Snackbar für Benachrichtigungen
 import { useSnackbar } from 'notistack'
+
+// 🧩 Material UI für Buttons & Layout
 import { Button, ButtonGroup, Box } from '@mui/material'
 
-const locales = {
-    'de-CH': deCH
-}
+// 🌍 Lokalisierung für Kalender auf Schweizerdeutsch
+const locales = { 'de-CH': deCH }
 
+// 📅 Lokalisierer für date-fns + React Big Calendar
 const localizer = dateFnsLocalizer({
     format,
     parse,
@@ -18,19 +27,30 @@ const localizer = dateFnsLocalizer({
     locales
 })
 
+// 🔧 Hauptkomponente: Zeigt Kalender mit Reservierungen
 export default function ReservationCalendar({ reservations, rooms }) {
+    // 🗂 Aktuelle Kalenderansicht (z.B. Woche)
     const [view, setView] = useState('week')
+
+    // 📍 Aktuelles Datum im Kalender
     const [currentDate, setCurrentDate] = useState(new Date())
+
+    // 🏢 Raumfilter (null = alle Räume)
     const [selectedRoomId, setSelectedRoomId] = useState(null)
+
+    // 🔔 Snackbar zum Anzeigen von Infos
     const { enqueueSnackbar } = useSnackbar()
 
+    // 📋 Räume nach Auswahl filtern
     const filteredRooms = selectedRoomId ? rooms.filter(r => r.id === selectedRoomId) : rooms
 
+    // 🏷 Ressourcenliste für parallele Raumansicht (resourceId)
     const resources = filteredRooms.map(r => ({
         resourceId: r.id,
         resourceTitle: r.name
     }))
 
+    // 📅 Events für Kalender vorbereiten
     const events = []
 
     reservations.forEach(r => {
@@ -40,9 +60,10 @@ export default function ReservationCalendar({ reservations, rooms }) {
         let current = new Date(r.startTime)
         const end = new Date(r.endTime)
 
+        // ⏱ Reservierungen, die über mehrere Tage gehen, in Tagesabschnitte aufteilen
         while (current < end) {
             const nextDay = new Date(current)
-            nextDay.setHours(23, 59, 59, 999)
+            nextDay.setHours(23, 59, 59, 999) // Tagesende
 
             const segmentEnd = nextDay < end ? nextDay : end
 
@@ -55,12 +76,14 @@ export default function ReservationCalendar({ reservations, rooms }) {
                 resourceId: r.roomId
             })
 
+            // 👉 Zum nächsten Tag springen
             current = new Date(segmentEnd)
             current.setHours(0, 0, 0, 0)
             current.setDate(current.getDate() + 1)
         }
     })
 
+    // 🎨 Stil für jedes Event (blauer Balken)
     const eventStyleGetter = () => ({
         style: {
             backgroundColor: '#1976d2',
@@ -70,12 +93,14 @@ export default function ReservationCalendar({ reservations, rooms }) {
         }
     })
 
+    // 🖱 Zeigt Reservierungstitel beim Klick auf Event
     const handleSelectEvent = (event) => {
         enqueueSnackbar(`Reservierung: ${event.title}`, { variant: 'info' })
     }
 
     return (
         <Box>
+            {/* 🔘 Raumfilter-Buttons */}
             <ButtonGroup sx={{ mb: 2 }} variant="outlined">
                 <Button
                     onClick={() => setSelectedRoomId(null)}
@@ -94,6 +119,7 @@ export default function ReservationCalendar({ reservations, rooms }) {
                 ))}
             </ButtonGroup>
 
+            {/* 📅 Kalenderanzeige */}
             <div className="custom-calendar" style={{ height: 600 }}>
                 <Calendar
                     localizer={localizer}
@@ -123,7 +149,7 @@ export default function ReservationCalendar({ reservations, rooms }) {
                         next: 'Weiter'
                     }}
                     formats={{
-                        timeGutterFormat: 'HH:mm',
+                        timeGutterFormat: 'HH:mm', // 24h Anzeige
                         eventTimeRangeFormat: ({ start, end }) =>
                             `${start.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })} – ${end.toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })}`
                     }}
